@@ -24,3 +24,20 @@ ctx.scale(5, 5);
 for (let pad of pads) {
     ctx.fillRect(pad.x, pad.y, pad.diameter, pad.diameter);
 }
+
+var mouseStart = undefined;
+
+// Hook the mouse events to draw wires
+canvas.onmousedown = function(e) {
+    console.log("mousedown", e.x, e.y);
+    mouseStart = { x: e.x, y: e.y };
+}
+
+canvas.onmousemove = function(e) {
+    if (mouseStart) {
+        console.log("mousemove", e.x, e.y);
+    }
+}
+canvas.onmouseup = function(e) {
+    mouseStart = undefined;
+}
