@@ -37,4 +37,4 @@ A first set of user operations might be:
 * Rotate this part
 * Undo stack
 
-Units are integers in nm (nanometers) -- the rationale for this is .00001 (1E-05) inches = 254nm, and a 32 bit signed integer representation of nanometers would be 2147483647 nm = 2.1 m which is plenty big with plenty of precision.
+Units are numbers in mm. Because JavaScript and none of your business how numbers work.
