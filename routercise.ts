@@ -34,21 +34,9 @@ function getCoordinates(e: MouseEvent) {
 }
 
 var currentLine: SVGLineElement;
+var lastPoint: DOMPoint;
 
 // Hook the mouse events to draw wires
-svg.onmousedown = function(e) {
-    const mouseStart = getCoordinates(e);
-    currentLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    currentLine.setAttribute("x1", String(mouseStart.x));
-    currentLine.setAttribute("y1", String(mouseStart.y));
-    currentLine.setAttribute("x2", String(mouseStart.x));
-    currentLine.setAttribute("y2", String(mouseStart.y));
-    currentLine.setAttribute("stroke", "black");
-    currentLine.setAttribute("stroke-linecap", "round");
-    currentLine.setAttribute("stroke-width", String(traceWidth));
-    parentG.appendChild(currentLine);
-}
-
 svg.onmousemove = function(e) {
     if (currentLine) {
         let mouseEnd = getCoordinates(e);
@@ -57,6 +45,36 @@ svg.onmousemove = function(e) {
         }
 }
 
-svg.onmouseup = function(e) {
+function maybeTerminateLineDrawing() {
+    // Delete the current line
+    parentG.removeChild(currentLine);
+    // All done drawing now
+    lastPoint = undefined;
     currentLine = undefined;
+}
+
+window.onkeydown = function(e: KeyboardEvent) {
+    if (e.keyCode == 27) {
+        console.log("Escape!");
+        maybeTerminateLineDrawing();
+    }
+}
+
+svg.onmouseup = function(e) {
+    const mouseStart = getCoordinates(e);
+    if ((lastPoint) && (mouseStart.x == lastPoint.x) && (mouseStart.y == lastPoint.y)) {
+        maybeTerminateLineDrawing()
+    }
+    else {
+        lastPoint = mouseStart;
+        currentLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        currentLine.setAttribute("x1", String(mouseStart.x));
+        currentLine.setAttribute("y1", String(mouseStart.y));
+        currentLine.setAttribute("x2", String(mouseStart.x));
+        currentLine.setAttribute("y2", String(mouseStart.y));
+        currentLine.setAttribute("stroke", "black");
+        currentLine.setAttribute("stroke-linecap", "round");
+        currentLine.setAttribute("stroke-width", String(traceWidth));
+        parentG.appendChild(currentLine);
+    }
 }
