@@ -2,6 +2,18 @@
 <html>
     <head>
         <title>Routercise!</title>
+        <style>
+            .target {
+                animation-name: fade;
+                animation-duration: 0.4s;
+                animation-direction: alternate;
+                animation-iteration-count: infinite;
+            }
+            @keyframes fade {
+                from {opacity: 1;}
+                to {opacity: 0.2;}
+            }
+        </style>
     </head>
     <body>
         <svg id="svg">

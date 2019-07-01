@@ -68,6 +68,9 @@ svg.onmouseup = function(e) {
         maybeTerminateLineDrawing()
     }
     else {
+        if (currentLine) {
+            currentLine.classList.remove("target");
+        }
         lastPoint = mouseStart;
         currentLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
         currentLine.setAttribute("x1", String(mouseStart.x));
@@ -77,6 +80,8 @@ svg.onmouseup = function(e) {
         currentLine.setAttribute("stroke", "black");
         currentLine.setAttribute("stroke-linecap", "round");
         currentLine.setAttribute("stroke-width", String(traceWidth));
+        currentLine.classList.add("target");
+        // currentLine.setAttribute("class", "target");
         parentG.appendChild(currentLine);
     }
 }
