@@ -12,7 +12,7 @@ let pads: Pad[] = [
     {id: 'B2', x: 20, y: 20, diameter: 2.54},
 ];
 
-const svg = document.getElementById("svg");
+const svg = <SVGSVGElement> <any> document.getElementById("svg");
 const parentG = <SVGGElement> svg.getElementsByTagName("g")[0];
 
 // Draw all the pads
@@ -28,15 +28,23 @@ var mouseStart = undefined;
 
 // Hook the mouse events to draw wires
 svg.onmousedown = function(e) {
-    console.log("mousedown", e.x, e.y);
-    mouseStart = { x: e.x, y: e.y };
+    mouseStart = svg.createSVGPoint();
+    mouseStart.x = e.x;
+    mouseStart.y = e.y;
+    mouseStart = mouseStart.matrixTransform(parentG.getScreenCTM().inverse());
+    console.log("mousedown", mouseStart.x, mouseStart.y);
 }
 
 svg.onmousemove = function(e) {
     if (mouseStart) {
-        console.log("mousemove", e.x, e.y);
+        let mouseEnd = svg.createSVGPoint();
+        mouseEnd.x = e.x;
+        mouseEnd.y = e.y;
+        mouseEnd = mouseEnd.matrixTransform(parentG.getScreenCTM().inverse());
+        console.log("mousedown", mouseEnd.x, mouseEnd.y);
     }
 }
+
 svg.onmouseup = function(e) {
     mouseStart = undefined;
 }
