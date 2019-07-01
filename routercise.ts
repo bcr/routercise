@@ -13,7 +13,7 @@ let pads: Pad[] = [
 ];
 
 const svg = document.getElementById("svg");
-// svg.setAttribute('transform','scale(5, 5)');
+const parentG = <SVGGElement> svg.getElementsByTagName("g")[0];
 
 // Draw all the pads
 for (let pad of pads) {
@@ -21,7 +21,7 @@ for (let pad of pads) {
     circle.setAttribute("cx", String(pad.x));
     circle.setAttribute("cy", String(pad.y));
     circle.setAttribute("r", String(pad.diameter / 2));
-    svg.appendChild(circle);
+    parentG.appendChild(circle);
 }
 
 var mouseStart = undefined;
