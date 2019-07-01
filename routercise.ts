@@ -46,16 +46,18 @@ svg.onmousemove = function(e) {
 }
 
 function maybeTerminateLineDrawing() {
-    // Delete the current line
-    parentG.removeChild(currentLine);
-    // All done drawing now
-    lastPoint = undefined;
-    currentLine = undefined;
+    if (currentLine) {
+        // Delete the current line
+        parentG.removeChild(currentLine);
+        // All done drawing now
+        lastPoint = undefined;
+        currentLine = undefined;
+    }
 }
 
 window.onkeydown = function(e: KeyboardEvent) {
     if (e.keyCode == 27) {
-        console.log("Escape!");
+        // Escape pressed
         maybeTerminateLineDrawing();
     }
 }
