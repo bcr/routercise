@@ -127,6 +127,8 @@ function checkEverything() {
         }
     }
 
+    let usedWireNets: Wire[][] = [];
+
     for (let net of nets) {
         let foundHome = false;
         for (let wireNet of wireNets) {
@@ -150,11 +152,18 @@ function checkEverything() {
                     bad = true;
                 }
             }
-            if (foundHome && thisNetStatus) {
-                console.log("Found two homes! No good man.")
-                bad = true;
-            }
             foundHome = (foundHome || thisNetStatus);
+
+            if (thisNetStatus) {
+                // Make sure some other net didn't grab this
+                if (usedWireNets.indexOf(wireNet) != -1) {
+                    console.log("Wire net used more than once!");
+                    bad = true;
+                }
+                else {
+                    usedWireNets.push(wireNet);
+                }
+            }
         }
 
         if (!foundHome) {
