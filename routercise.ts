@@ -102,6 +102,18 @@ function padIntersectsWire(a: Pad, b: Wire) : boolean {
     return result;
 }
 
+function buildConnectedWires(wire: Wire, currentNet: Wire[]) {
+    if (currentNet.indexOf(wire) == -1) {
+        currentNet.push(wire);
+    }
+
+    for (let innerWire of wires) {
+        if ((currentNet.indexOf(innerWire) == -1) && (wiresIntersect(wire, innerWire))) {
+            buildConnectedWires(innerWire, currentNet);
+        }
+    }
+}
+
 function checkEverything() {
     let wireNets: Wire[][] = [];
     let bad = false;
@@ -118,12 +130,7 @@ function checkEverything() {
 
         if (currentNet.length == 0) {
             wireNets.push(currentNet);
-        }
-
-        for (let innerWire of wires) {
-            if ((currentNet.indexOf(innerWire) == -1) && (wiresIntersect(wire, innerWire))) {
-                currentNet.push(innerWire);
-            }
+            buildConnectedWires(wire, currentNet);
         }
     }
 
