@@ -20,6 +20,11 @@ let pads: Pad[] = [
     {id: 'B2', x: 20, y: 20, diameter: 2.54},
 ];
 
+let nets: Pad[][] = [
+    [ pads[0], pads[1] ],
+    [ pads[2], pads[3] ]
+];
+
 let wires: Wire[] = [];
 
 const svg = <SVGSVGElement> <any> document.getElementById("svg");
@@ -78,18 +83,28 @@ function line_intersects(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) {
 
 function wiresIntersect(a: Wire, b: Wire) : boolean {
     const result = line_intersects(a.x1, a.y1, a.x2, a.y2, b.x1, b.y1, b.x2, b.y2);
-    if (result) {
-        console.log(a, b, "intersect");
-    }
-    else {
-        console.log(a, b, "DO NOT intersect");
-    }
 
     return result ? true : false;
 }
 
+function padIntersectsWire(a: Pad, b: Wire) : boolean {
+    // !!! Cheating
+    // If either end of the wire is in the pad, they touch
+
+    const padMinX = a.x - (a.diameter / 2);
+    const padMaxX = a.x + (a.diameter / 2);
+    const padMinY = a.y - (a.diameter / 2);
+    const padMaxY = a.y + (a.diameter / 2);
+
+    let result =  ((b.x1 >= padMinX) && (b.x1 <= padMaxX) && (b.y1 >= padMinY) && (b.y1 <= padMaxY)) ||
+            ((b.x2 >= padMinX) && (b.x2 <= padMaxX) && (b.y2 >= padMinY) && (b.y2 <= padMaxY))
+    console.log(a, (result ? "intersects" : "does not intersect"), b);
+    return result;
+}
+
 function checkEverything() {
     let wireNets: Wire[][] = [];
+    let bad = false;
 
     for (let wire of wires) {
         let currentNet: Wire[] = [];
@@ -112,17 +127,42 @@ function checkEverything() {
         }
     }
 
-    console.log(wireNets);
+    for (let net of nets) {
+        let foundHome = false;
+        for (let wireNet of wireNets) {
+            let thisNetStatus = undefined;
+            for (let pad of net) {
+                let thisPadStatus = false;
+                for (let wire of wireNet) {
+                    // See if we touch any wire
+                    if (padIntersectsWire(pad, wire)) {
+                        thisPadStatus = true;
+                        break;
+                    }
+                }
 
-    // let nets = [];
-    // for (let pad of pads) {
-    //     let net: Pad[] = [];
-    //     net.push(pad);
+                if ((thisNetStatus == undefined) || (thisPadStatus == thisNetStatus)) {
+                    thisNetStatus = thisPadStatus;
+                }
+                else {
+                    // Pad doesn't match net status man
+                    console.log(pad, "does not match status man");
+                    bad = true;
+                }
+            }
+            if (foundHome && thisNetStatus) {
+                console.log("Found two homes! No good man.")
+                bad = true;
+            }
+            foundHome = (foundHome || thisNetStatus);
+        }
 
-    //     for (let wire of wires) {
-
-    //     }
-    // }
+        if (!foundHome) {
+            console.log(net, "is homeless");
+            bad = true;
+        }
+    }
+    console.log(bad ? "It was bad, sorry" : "It was good!");
 }
 
 var currentLine: SVGLineElement;
