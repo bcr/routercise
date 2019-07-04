@@ -46,6 +46,35 @@ for (let pad of pads) {
     parentG.appendChild(circle);
 }
 
+// Draw all the airwires
+for (let net of nets) {
+    for (let pad of net.pads) {
+        let closestPad: Pad;
+        let closestPadDistance: number = undefined;
+
+        // Draw a line from this pad to the closest other pad
+        for (let innerPad of net.pads) {
+            const padDistance = Math.sqrt(
+                Math.pow(pad.x - innerPad.x, 2) +
+                Math.pow(pad.y - innerPad.y, 2)
+                );
+
+            if ((pad != innerPad) && ((closestPadDistance == undefined) || (padDistance < closestPadDistance))) {
+                closestPadDistance = padDistance;
+                closestPad = innerPad;
+            }
+        }
+
+        const airwire = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        airwire.setAttribute("x1", String(pad.x));
+        airwire.setAttribute("y1", String(pad.y));
+        airwire.setAttribute("x2", String(closestPad.x));
+        airwire.setAttribute("y2", String(closestPad.y));
+        airwire.classList.add("airwire");
+        parentG.appendChild(airwire);
+    }
+}
+
 function getCoordinates(e: MouseEvent) {
     let coord = svg.createSVGPoint();
     coord.x = e.x;
