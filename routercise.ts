@@ -13,6 +13,11 @@ class Wire {
     width : number;
 }
 
+class Net {
+    name : string;
+    pads : Pad[];
+}
+
 let pads: Pad[] = [
     {id: 'A1', x: 10, y: 10, diameter: 2.54},
     {id: 'A2', x: 10, y: 20, diameter: 2.54},
@@ -20,9 +25,9 @@ let pads: Pad[] = [
     {id: 'B2', x: 20, y: 20, diameter: 2.54},
 ];
 
-let nets: Pad[][] = [
-    [ pads[0], pads[1] ],
-    [ pads[2], pads[3] ]
+let nets: Net[] = [
+    { name: 'A', pads: [pads[0], pads[1]] },
+    { name: 'B', pads: [pads[2], pads[3]] },
 ];
 
 let wires: Wire[] = [];
@@ -140,7 +145,7 @@ function checkEverything() {
         let foundHome = false;
         for (let wireNet of wireNets) {
             let thisNetStatus = undefined;
-            for (let pad of net) {
+            for (let pad of net.pads) {
                 let thisPadStatus = false;
                 for (let wire of wireNet) {
                     // See if we touch any wire
