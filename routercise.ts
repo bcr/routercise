@@ -52,11 +52,26 @@ const levels: Level[] = [
     new Level([
         {id: 'A1', x: 10, y: 10, diameter: 2.54},
         {id: 'A2', x: 10, y: 20, diameter: 2.54},
+        ], [
+        new Net('A', [0, 1]),
+        ]),
+    new Level([
+        {id: 'A1', x: 10, y: 10, diameter: 2.54},
+        {id: 'A2', x: 10, y: 20, diameter: 2.54},
         {id: 'B1', x: 20, y: 10, diameter: 2.54},
         {id: 'B2', x: 20, y: 20, diameter: 2.54},
         ], [
         new Net('A', [0, 1]),
         new Net('B', [2, 3]),
+        ]),
+    new Level([
+        {id: 'A1', x: 10, y: 10, diameter: 2.54},
+        {id: 'A2', x: 10, y: 20, diameter: 2.54},
+        {id: 'B1', x: 20, y: 10, diameter: 2.54},
+        {id: 'B2', x: 20, y: 20, diameter: 2.54},
+        ], [
+        new Net('A', [0, 3]),
+        new Net('B', [1, 2]),
         ]),
 ];
 
