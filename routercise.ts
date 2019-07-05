@@ -222,7 +222,7 @@ var lastPoint: DOMPoint;
 // Hook the mouse events to draw wires
 svg.onmousemove = function(e) {
     if (currentLine) {
-        let mouseEnd = getCoordinates(e);
+        let mouseEnd = gridCoordinate(getCoordinates(e));
         currentLine.setAttribute("x2", String(mouseEnd.x));
         currentWire.x2 = mouseEnd.x;
         currentLine.setAttribute("y2", String(mouseEnd.y));
@@ -253,8 +253,18 @@ window.onkeydown = function(e: KeyboardEvent) {
     }
 }
 
+const grid = { x: 1, y: 1 };
+
+function gridCoordinate(p: DOMPoint) : DOMPoint {
+    let coord = svg.createSVGPoint();
+    coord.x = Math.round(p.x / grid.x) * grid.x;
+    coord.y = Math.round(p.y / grid.y) * grid.y;
+
+    return coord;
+}
+
 svg.onmouseup = function(e) {
-    const mouseStart = getCoordinates(e);
+    const mouseStart = gridCoordinate(getCoordinates(e));
     if ((lastPoint) && (mouseStart.x == lastPoint.x) && (mouseStart.y == lastPoint.y)) {
         maybeTerminateLineDrawing()
     }
