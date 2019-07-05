@@ -109,10 +109,21 @@ function drawPads() {
     }
 }
 
-function drawAirwires() {
+function updateAirwires() {
+    // Clear any existing airwires
+    let airwires = parentG.getElementsByClassName('airwire');
+
+    while(airwires[0]) {
+        airwires[0].parentNode.removeChild(airwires[0]);
+    }​
+
     // Draw all the airwires
     for (let net of nets) {
         for (let pad of net.pads) {
+            if (!padUIElements[pads.indexOf(pad)].classList.contains("drcerror")) {
+                // This pad is cool, no airwire needed for him
+                continue;
+            }
             let closestPad: Pad;
             let closestPadDistance: number = undefined;
 
@@ -147,7 +158,6 @@ function startCurrentLevel() {
 
     clearG();
     drawPads();
-    drawAirwires();
     checkEverything();
 }
 
@@ -312,6 +322,7 @@ function checkEverything() {
         }
     }
     console.log(bad ? "It was bad, sorry" : "It was good!");
+    updateAirwires();
     return !bad;
 }
 
