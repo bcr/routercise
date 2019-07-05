@@ -283,15 +283,20 @@ function gridCoordinate(p: DOMPoint) : DOMPoint {
     return coord;
 }
 
+function maybeCommitCurrentLine() {
+    if (currentLine) {
+        currentLine.classList.remove("target");
+        checkEverything();
+    }
+}
+
 svg.onmouseup = function(e) {
     const mouseStart = gridCoordinate(getCoordinates(e));
     if ((lastPoint) && (mouseStart.x == lastPoint.x) && (mouseStart.y == lastPoint.y)) {
         maybeTerminateLineDrawing()
     }
     else {
-        if (currentLine) {
-            currentLine.classList.remove("target");
-        }
+        maybeCommitCurrentLine();
         lastPoint = mouseStart;
         currentLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
         currentWire = new Wire();
