@@ -75,9 +75,11 @@ const levels: Level[] = [
         ]),
 ];
 
-let pads: Pad[] = levels[0].pads;
+let levelNumber: number = 0;
 
-let nets: Net[] = levels[0].nets;
+let pads: Pad[] = [];
+
+let nets: Net[] = [];
 
 let wires: Wire[] = [];
 
@@ -88,46 +90,72 @@ var traceWidth = 0.5;
 
 let padUIElements: SVGElement[] = [];
 
-// Draw all the pads
-for (let pad of pads) {
-    let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    circle.setAttribute("cx", String(pad.x));
-    circle.setAttribute("cy", String(pad.y));
-    circle.setAttribute("r", String(pad.diameter / 2));
-    parentG.appendChild(circle);
-    padUIElements.push(circle);
+function clearG() {
+    while (parentG.firstChild) {
+        parentG.removeChild(parentG.firstChild);
+    }
+    padUIElements = [];
 }
 
-// Draw all the airwires
-for (let net of nets) {
-    for (let pad of net.pads) {
-        let closestPad: Pad;
-        let closestPadDistance: number = undefined;
-
-        // Draw a line from this pad to the closest other pad
-        for (let innerPad of net.pads) {
-            const padDistance = Math.sqrt(
-                Math.pow(pad.x - innerPad.x, 2) +
-                Math.pow(pad.y - innerPad.y, 2)
-                );
-
-            if ((pad != innerPad) && ((closestPadDistance == undefined) || (padDistance < closestPadDistance))) {
-                closestPadDistance = padDistance;
-                closestPad = innerPad;
-            }
-        }
-
-        const airwire = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        airwire.setAttribute("x1", String(pad.x));
-        airwire.setAttribute("y1", String(pad.y));
-        airwire.setAttribute("x2", String(closestPad.x));
-        airwire.setAttribute("y2", String(closestPad.y));
-        airwire.classList.add("airwire");
-        parentG.appendChild(airwire);
+function drawPads() {
+    // Draw all the pads
+    for (let pad of pads) {
+        let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", String(pad.x));
+        circle.setAttribute("cy", String(pad.y));
+        circle.setAttribute("r", String(pad.diameter / 2));
+        parentG.appendChild(circle);
+        padUIElements.push(circle);
     }
 }
 
-checkEverything();
+function drawAirwires() {
+    // Draw all the airwires
+    for (let net of nets) {
+        for (let pad of net.pads) {
+            let closestPad: Pad;
+            let closestPadDistance: number = undefined;
+
+            // Draw a line from this pad to the closest other pad
+            for (let innerPad of net.pads) {
+                const padDistance = Math.sqrt(
+                    Math.pow(pad.x - innerPad.x, 2) +
+                    Math.pow(pad.y - innerPad.y, 2)
+                    );
+
+                if ((pad != innerPad) && ((closestPadDistance == undefined) || (padDistance < closestPadDistance))) {
+                    closestPadDistance = padDistance;
+                    closestPad = innerPad;
+                }
+            }
+
+            const airwire = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            airwire.setAttribute("x1", String(pad.x));
+            airwire.setAttribute("y1", String(pad.y));
+            airwire.setAttribute("x2", String(closestPad.x));
+            airwire.setAttribute("y2", String(closestPad.y));
+            airwire.classList.add("airwire");
+            parentG.appendChild(airwire);
+        }
+    }
+}
+
+function startCurrentLevel() {
+    pads = levels[levelNumber].pads;
+    nets = levels[levelNumber].nets;
+    wires = [];
+
+    clearG();
+    drawPads();
+    drawAirwires();
+    checkEverything();
+}
+
+function advanceToNextLevel() {
+    // All done with level
+    ++levelNumber;
+    startCurrentLevel();
+}
 
 function getCoordinates(e: MouseEvent) {
     let coord = svg.createSVGPoint();
@@ -284,6 +312,7 @@ function checkEverything() {
         }
     }
     console.log(bad ? "It was bad, sorry" : "It was good!");
+    return !bad;
 }
 
 var currentLine: SVGLineElement;
@@ -337,7 +366,9 @@ function gridCoordinate(p: DOMPoint) : DOMPoint {
 function maybeCommitCurrentLine() {
     if (currentLine) {
         currentLine.classList.remove("target");
-        checkEverything();
+        lastPoint = undefined;
+        currentLine = undefined;
+        currentWire = undefined;
     }
 }
 
@@ -348,23 +379,30 @@ svg.onmouseup = function(e) {
     }
     else {
         maybeCommitCurrentLine();
-        lastPoint = mouseStart;
-        currentLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        currentWire = new Wire();
-        currentLine.setAttribute("x1", String(mouseStart.x));
-        currentWire.x1 = mouseStart.x;
-        currentLine.setAttribute("y1", String(mouseStart.y));
-        currentWire.y1 = mouseStart.y;
-        currentLine.setAttribute("x2", String(mouseStart.x));
-        currentWire.x2 = mouseStart.x;
-        currentLine.setAttribute("y2", String(mouseStart.y));
-        currentWire.y2 = mouseStart.y;
-        currentLine.setAttribute("stroke", "black");
-        currentLine.setAttribute("stroke-linecap", "round");
-        currentLine.setAttribute("stroke-width", String(traceWidth));
-        currentLine.classList.add("target");
-        // currentLine.setAttribute("class", "target");
-        parentG.appendChild(currentLine);
-        wires.push(currentWire);
+        if (checkEverything()) {
+            advanceToNextLevel();
+        }
+        else {
+            lastPoint = mouseStart;
+            currentLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            currentWire = new Wire();
+            currentLine.setAttribute("x1", String(mouseStart.x));
+            currentWire.x1 = mouseStart.x;
+            currentLine.setAttribute("y1", String(mouseStart.y));
+            currentWire.y1 = mouseStart.y;
+            currentLine.setAttribute("x2", String(mouseStart.x));
+            currentWire.x2 = mouseStart.x;
+            currentLine.setAttribute("y2", String(mouseStart.y));
+            currentWire.y2 = mouseStart.y;
+            currentLine.setAttribute("stroke", "black");
+            currentLine.setAttribute("stroke-linecap", "round");
+            currentLine.setAttribute("stroke-width", String(traceWidth));
+            currentLine.classList.add("target");
+            // currentLine.setAttribute("class", "target");
+            parentG.appendChild(currentLine);
+            wires.push(currentWire);
+        }
     }
 }
+
+startCurrentLevel();
