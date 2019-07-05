@@ -34,6 +34,7 @@ class Net {
 class Level {
     pads: Pad[];
     nets: Net[];
+    traceWidth: number;
 
     private bind() {
         for (let net of this.nets) {
@@ -41,9 +42,10 @@ class Level {
         }
     }
 
-    public constructor(pads: Pad[], nets: Net[]) {
+    public constructor(pads: Pad[], nets: Net[], traceWidth: number) {
         this.pads = pads;
         this.nets = nets;
+        this.traceWidth = traceWidth;
         this.bind();
     }
 }
@@ -54,7 +56,7 @@ const levels: Level[] = [
         {id: 'A2', x: 10, y: 20, diameter: 2.54},
         ], [
         new Net('A', [0, 1]),
-        ]),
+        ], 0.5),
     new Level([
         {id: 'A1', x: 10, y: 10, diameter: 2.54},
         {id: 'A2', x: 10, y: 20, diameter: 2.54},
@@ -63,7 +65,7 @@ const levels: Level[] = [
         ], [
         new Net('A', [0, 1]),
         new Net('B', [2, 3]),
-        ]),
+        ], 0.5),
     new Level([
         {id: 'A1', x: 10, y: 10, diameter: 2.54},
         {id: 'A2', x: 10, y: 20, diameter: 2.54},
@@ -72,7 +74,7 @@ const levels: Level[] = [
         ], [
         new Net('A', [0, 3]),
         new Net('B', [1, 2]),
-        ]),
+        ], 0.5),
     new Level([
         {id: 'A2', x: 10 + (0 * 1.27), y: 10 + (0 * 1.27), diameter: 0.787},
         {id: 'A1', x: 10 + (0 * 1.27), y: 10 + (1 * 1.27), diameter: 0.787},
@@ -93,7 +95,7 @@ const levels: Level[] = [
         new Net('D', [3, 9]),
         new Net('E', [4, 10]),
         new Net('F', [5, 11]),
-        ]),
+        ], 0.254),
 ];
 
 let levelNumber: number = 0;
@@ -107,7 +109,7 @@ let wires: Wire[] = [];
 const svg = <SVGSVGElement> <any> document.getElementById("svg");
 const parentG = <SVGGElement> svg.getElementsByTagName("g")[0];
 
-var traceWidth = 0.5;
+let traceWidth: number;
 
 let padUIElements: SVGElement[] = [];
 
@@ -175,6 +177,7 @@ function updateAirwires() {
 function startCurrentLevel() {
     pads = levels[levelNumber].pads;
     nets = levels[levelNumber].nets;
+    traceWidth = levels[levelNumber].traceWidth;
     wires = [];
 
     clearG();
@@ -385,7 +388,7 @@ window.onkeydown = function(e: KeyboardEvent) {
     }
 }
 
-const grid = { x: 1, y: 1 };
+const grid = { x: 0.1, y: 0.1 };
 
 function gridCoordinate(p: DOMPoint) : DOMPoint {
     let coord = svg.createSVGPoint();
