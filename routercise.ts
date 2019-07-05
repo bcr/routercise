@@ -132,7 +132,7 @@ function padIntersectsWire(a: Pad, b: Wire) : boolean {
 
     let result =  ((b.x1 >= padMinX) && (b.x1 <= padMaxX) && (b.y1 >= padMinY) && (b.y1 <= padMaxY)) ||
             ((b.x2 >= padMinX) && (b.x2 <= padMaxX) && (b.y2 >= padMinY) && (b.y2 <= padMaxY))
-    console.log(a, (result ? "intersects" : "does not intersect"), b);
+    // console.log(a, (result ? "intersects" : "does not intersect"), b);
     return result;
 }
 
