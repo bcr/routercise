@@ -16,19 +16,53 @@ class Wire {
 class Net {
     name : string;
     pads : Pad[];
+    padIndexes : number[];
+
+    bind(bindPads: Pad[]) {
+        for (let padIndex of this.padIndexes) {
+            this.pads.push(bindPads[padIndex]);
+        }
+    }
+
+    public constructor(name: string, padIndexes: number[]) {
+        this.name = name;
+        this.pads = [];
+        this.padIndexes = padIndexes;
+    }
 }
 
-let pads: Pad[] = [
-    {id: 'A1', x: 10, y: 10, diameter: 2.54},
-    {id: 'A2', x: 10, y: 20, diameter: 2.54},
-    {id: 'B1', x: 20, y: 10, diameter: 2.54},
-    {id: 'B2', x: 20, y: 20, diameter: 2.54},
+class Level {
+    pads: Pad[];
+    nets: Net[];
+
+    private bind() {
+        for (let net of this.nets) {
+            net.bind(this.pads);
+        }
+    }
+
+    public constructor(pads: Pad[], nets: Net[]) {
+        this.pads = pads;
+        this.nets = nets;
+        this.bind();
+    }
+}
+
+const levels: Level[] = [
+    new Level([
+        {id: 'A1', x: 10, y: 10, diameter: 2.54},
+        {id: 'A2', x: 10, y: 20, diameter: 2.54},
+        {id: 'B1', x: 20, y: 10, diameter: 2.54},
+        {id: 'B2', x: 20, y: 20, diameter: 2.54},
+        ], [
+        new Net('A', [0, 1]),
+        new Net('B', [2, 3]),
+        ]),
 ];
 
-let nets: Net[] = [
-    { name: 'A', pads: [pads[0], pads[1]] },
-    { name: 'B', pads: [pads[2], pads[3]] },
-];
+let pads: Pad[] = levels[0].pads;
+
+let nets: Net[] = levels[0].nets;
 
 let wires: Wire[] = [];
 
