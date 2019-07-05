@@ -37,6 +37,8 @@ const parentG = <SVGGElement> svg.getElementsByTagName("g")[0];
 
 var traceWidth = 0.5;
 
+let padUIElements: SVGElement[] = [];
+
 // Draw all the pads
 for (let pad of pads) {
     let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
@@ -44,6 +46,7 @@ for (let pad of pads) {
     circle.setAttribute("cy", String(pad.y));
     circle.setAttribute("r", String(pad.diameter / 2));
     parentG.appendChild(circle);
+    padUIElements.push(circle);
 }
 
 // Draw all the airwires
@@ -148,9 +151,23 @@ function buildConnectedWires(wire: Wire, currentNet: Wire[]) {
     }
 }
 
+function clearBadPads() {
+    for (let pad of padUIElements) {
+        pad.classList.remove("drcerror");
+    }
+}
+
+function setPadsBad(parr: Pad[]) {
+    for (let p of parr) {
+        padUIElements[pads.indexOf(p)].classList.add("drcerror");
+    }
+}
+
 function checkEverything() {
     let wireNets: Wire[][] = [];
     let bad = false;
+
+    clearBadPads();
 
     for (let wire of wires) {
         let currentNet: Wire[] = [];
@@ -190,6 +207,7 @@ function checkEverything() {
                 else {
                     // Pad doesn't match net status man
                     console.log(pad, "does not match status man");
+                    setPadsBad([pad]);
                     bad = true;
                 }
             }
@@ -199,6 +217,7 @@ function checkEverything() {
                 // Make sure some other net didn't grab this
                 if (usedWireNets.indexOf(wireNet) != -1) {
                     console.log("Wire net used more than once!");
+                    setPadsBad(net.pads);
                     bad = true;
                 }
                 else {
@@ -209,6 +228,7 @@ function checkEverything() {
 
         if (!foundHome) {
             console.log(net, "is homeless");
+            setPadsBad(net.pads);
             bad = true;
         }
     }
