@@ -78,6 +78,8 @@ for (let net of nets) {
     }
 }
 
+checkEverything();
+
 function getCoordinates(e: MouseEvent) {
     let coord = svg.createSVGPoint();
     coord.x = e.x;
