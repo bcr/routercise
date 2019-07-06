@@ -195,6 +195,7 @@ function updateAirwires() {
 }
 
 function startCurrentLevel() {
+    console.log("Starting level", JSON.stringify(levels[levelNumber]));
     pads = levels[levelNumber].pads;
     nets = levels[levelNumber].nets;
     traceWidth = levels[levelNumber].traceWidth;
@@ -209,6 +210,7 @@ function startCurrentLevel() {
 
 function advanceToNextLevel() {
     // All done with level
+    console.log("Solution was", JSON.stringify(wires));
     ++levelNumber;
     startCurrentLevel();
 }
