@@ -456,6 +456,7 @@ svg.onmouseup = function(e) {
             currentLine.setAttribute("stroke", "black");
             currentLine.setAttribute("stroke-linecap", "round");
             currentLine.setAttribute("stroke-width", String(traceWidth));
+            currentWire.width = traceWidth;
             currentLine.classList.add("target");
             // currentLine.setAttribute("class", "target");
             parentG.appendChild(currentLine);
